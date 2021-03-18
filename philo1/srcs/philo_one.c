@@ -9,4 +9,5 @@ int		main(int ac, char **av)
 		return (1);
 	}
 	printf("ok\n");
+	return (0);
 }

@@ -17,3 +17,10 @@ typedef struct	s_philo
 }				t_philo;
 
 #endif
+
+
+/*
+**		UTILS.C
+*/
+int				ft_strlen(char *str);
+long			ft_atoi(const char *str);
