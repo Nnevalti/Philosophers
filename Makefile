@@ -6,7 +6,7 @@ BLUE=\033[0;34m
 SET=\033[0m
 
 CC						=	gcc
-CFLAGS					=	-Wall -Werror -Wextra -pthread
+CFLAGS					=	-Wall -Werror -Wextra -g
 
 PHILO_ONE				=	philo_one
 PHILO_TWO				=	philo_two
@@ -24,7 +24,13 @@ OBJS_DIR_ONE			=	./philo1/objs
 OBJS_DIR_TWO			=	./philo2/objs
 OBJS_DIR_THREE			=	./philo3/objs
 
-SRCS_ONE				=	philo_one.c
+SRCS_ONE				=	philo_one.c \
+							init.c \
+							philo_actions.c \
+							free.c \
+							exit.c \
+							utils.c
+
 SRCS_TWO				=	philo_two.c
 SRCS_THREE				=	philo_three.c
 
@@ -47,13 +53,13 @@ objs					:
 							mkdir -p $(OBJS_DIR_ONE) $(OBJS_DIR_TWO) $(OBJS_DIR_THREE)
 
 $(PHILO_ONE)			:	objs $(OBJS_ONE)
-							$(CC) $(OBJS_ONE) -lm -o $(PHILO_ONE)
+							$(CC) $(OBJS_ONE) -pthread -o $(PHILO_ONE)
 
 $(PHILO_TWO)			:	objs $(OBJS_TWO)
-							$(CC) $(OBJS_TWO) -lm -o $(PHILO_TWO)
+							$(CC) $(OBJS_TWO) -pthread -o $(PHILO_TWO)
 
 $(PHILO_THREE)			:	objs $(OBJS_THREE)
-							$(CC) $(OBJS_THREE) -lm -o $(PHILO_THREE)
+							$(CC) $(OBJS_THREE) -pthread -o $(PHILO_THREE)
 
 
 clean					:

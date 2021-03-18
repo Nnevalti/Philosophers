@@ -1,40 +1,27 @@
-#include "../include/philo_one.h"
+#include "../includes/philo_one.h"
 
-long			ft_nblen(long nb)
+unsigned int	get_time(unsigned int start_sec, unsigned start_usec)
 {
-	int		len;
+	struct timeval	now;
 
-	len = nb <= 0 ? 1 : 0;
-	while (nb != 0)
-	{
-		nb = nb / 10;
-		len++;
-	}
-	return (len);
+	gettimeofday(&now, NULL);
+	return ((now.tv_sec - start_sec * S_IN_US) + (now.tv_usec - start_usec));
 }
 
-char			*ft_itoa(long nb)
+unsigned int	get_time_sec(void)
 {
-	int				sign;
-	int				len;
-	char			*str;
+	struct timeval	now;
 
-	sign = (nb < 0 ? 1 : 0);
-	len = ft_nblen(nb);
-	if (sign == 1)
-	nb = -nb;
-	if (!(str = (char *)malloc(sizeof(char) * len + 1)))
-	return (NULL);
-	str[len--] = '\0';
-	while (len >= 0)
-	{
-		str[len] = nb % 10 + '0';
-		nb = nb / 10;
-		len--;
-	}
-	if (sign == 1)
-	str[0] = '-';
-	return (str);
+	gettimeofday(&now, NULL);
+	return (now.tv_sec);
+}
+
+unsigned int	get_time_usec(void)
+{
+	struct timeval	now;
+
+	gettimeofday(&now, NULL);
+	return (now.tv_usec);
 }
 
 long		ft_atoi(const char *str)
