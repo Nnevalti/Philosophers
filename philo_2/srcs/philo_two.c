@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_one.c                                        :+:      :+:    :+:   */
+/*   philo_two.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -99,7 +99,6 @@ int		main(int ac, char **av)
 	if (init_sem(&sem, data.nb_philosopher))
 		return (exit_error("Error: init semaphore failed"));
 	philo = init_philo(&data, &sem);
-	// here for now
 	start_philosophers(&data, philo);
 	end_philosophers(philo, &sem);
 	if (data.state == DEAD)

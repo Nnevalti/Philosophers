@@ -10,51 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_three.h"
+#include "../includes/philo_two.h"
 
-void		init_mutex_fork(t_philo *philo, int nb_philosopher)
+int			init_sem(t_sem *sem, int nb_p)
 {
-	int		i;
-
-	i = 0;
-	while (i < nb_philosopher)
-	{
-		if (!(philo[i].left_fork = malloc(sizeof(pthread_mutex_t))))
-			return ;
-		pthread_mutex_init(philo[i].left_fork, NULL);
-		i++;
-	}
-	i = 0;
-	while (i < nb_philosopher)
-	{
-		philo[i].right_fork = philo[(i + 1) % nb_philosopher].left_fork;
-		i++;
-	}
+	sem_unlink("forks");
+	sem_unlink("state");
+	sem_unlink("stdout");
+	if ((sem->forks_sem = sem_open("forks", O_CREAT, 0644, nb_p)) == SEM_FAILED)
+		return (1);
+	if ((sem->state_sem = sem_open("state", O_CREAT, 0644, 1)) == SEM_FAILED)
+		return (1);
+	if ((sem->stdout_sem = sem_open("stdout", O_CREAT, 0644, 1)) == SEM_FAILED)
+		return (1);
+	return (0);
 }
 
-t_philo		*init_philo(t_data *data)
+void		init_philo(t_data *data, t_sem *sem, t_philo *philo)
 {
-	t_philo				*philo;
-	pthread_mutex_t		stdout_mutex;
-	pthread_mutex_t		state_mutex;
-	int					i;
-
-	if (!(philo = malloc(sizeof(t_philo) * data->nb_philosopher)))
-		return (NULL);
-	i = 0;
-	init_mutex_fork(philo, data->nb_philosopher);
-	pthread_mutex_init(&stdout_mutex, NULL);
-	pthread_mutex_init(&state_mutex, NULL);
-	while (i < data->nb_philosopher)
-	{
-		philo[i].data = data;
-		philo[i].state_mutex = state_mutex;
-		philo[i].stdout_mutex = stdout_mutex;
-		philo[i].index = i + 1;
-		philo[i].last_meal = get_time();
-		philo[i].nb_meal_eat = 0;
-		i++;
-	}
+	if (!(philo->pid = malloc(sizeof(pid_t) * data->nb_philosopher)))
+		return ;
+	philo->data = data;
+	philo->sem = sem;
+	philo->last_meal = get_time();
+	philo->nb_meal_eat = 0;
+	philo->stop = FALSE;
 	return (philo);
 }
 

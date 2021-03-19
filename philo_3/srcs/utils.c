@@ -20,12 +20,12 @@ long		get_time(void)
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-int				ft_isdigit(char c)
+int			ft_isdigit(char c)
 {
 	return (c >= '0' && c <= '9');
 }
 
-long			ft_atoi(const char *str)
+long		ft_atoi(const char *str)
 {
 	int		i;
 	int		sign;

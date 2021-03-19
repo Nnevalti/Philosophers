@@ -19,47 +19,42 @@ void	*death_check(void *philo_tmp)
 
 	philo = (t_philo *)philo_tmp;
 	data = philo->data;
-	printf("%lu > %u\n",
-		get_time() - philo->last_meal, data->time_to_die);
-	while (42 && data->state != DEAD
-		&& (!philo->nb_meal_eat
-			|| philo->nb_meal_eat < data->must_eat_nb_time))
+	while (data->state != DEAD && !philo->stop)
 	{
 		if ((get_time() - philo->last_meal) > data->time_to_die)
 		{
 			display_event(philo, DEATH);
-			pthread_mutex_lock(&philo->state_mutex);
+			sem_wait(philo->sem->state_sem);
 			data->state = DEAD;
-			pthread_mutex_unlock(&philo->state_mutex);
+			philo->stop = TRUE;
+			sem_post(philo->sem->state_sem);
 			break ;
 		}
 	}
 	return (NULL);
 }
 
-void	*philosophers(void *philo_tmp)
+void	*philosophers(t_philo *philo)
 {
-	t_philo		*philo;
 	t_data		*data;
 	pthread_t	death;
 
-	philo = (t_philo *)philo_tmp;
 	data = philo->data;
 	pthread_create(&death, NULL, &death_check, philo);
 	pthread_detach(death);
-	philo->index % 2 ? 0 : usleep(data->time_to_eat * MS_IN_US);
-	while (42 && data->state != DEAD
-		&& (!philo->nb_meal_eat
-			|| philo->nb_meal_eat < data->must_eat_nb_time))
+	while (data->state != DEAD && philo->stop == FALSE)
 	{
 		philo_eat(philo);
+		if (data->must_eat_nb_time
+			&& philo->nb_meal_eat == data->must_eat_nb_time)
+			philo->stop = TRUE;
 		display_event(philo, SLEEPING);
 		usleep(data->time_to_sleep * MS_IN_US);
 		display_event(philo, THINKING);
 	}
 	if (data->must_eat_nb_time
 		&& philo->nb_meal_eat == data->must_eat_nb_time)
-		data->nb_philo_full++;
+		data->nb_philo_full++;// semaphore to increment parent full + 1
 	return (NULL);
 }
 
@@ -71,45 +66,54 @@ void	start_philosophers(t_data *data, t_philo *philo)
 	data->start = get_time();
 	while (i < data->nb_philosopher)
 	{
-		pthread_create(&philo[i].thread, NULL, &philosophers, &philo[i]);
-		usleep(10);
-		i++;
+		if ((philo->pid[i] = fork()) == -1)
+			return ;
+		if (philo->pid[i++] == 0)
+		{
+			// process child
+			philo->id = i;
+			philosophers(philo);
+			// semaphore here ?
+			exit (0);
+		}
 	}
-	i = 0;
-	while (i < data->nb_philosopher)
-		pthread_join(philo[i++].thread, NULL);
+	// parent
+	// create thread to watch child state
+	// thread for philo_full
+	// wait for thread to end
+	// wait for all child to exit
 }
 
-void	end_philosophers(t_data *data, t_philo *philo)
+void	end_philosophers(t_philo *philo, t_sem *sem)
 {
-	int		i;
-
-	i = 0;
-	pthread_mutex_destroy(&philo[0].stdout_mutex);
-	pthread_mutex_destroy(&philo[0].state_mutex);
-	while (i < data->nb_philosopher)
-	{
-		pthread_mutex_destroy(philo[i].left_fork);
-		free(philo[i].left_fork);
-		i++;
-	}
+	sem_unlink("forks");
+	sem_unlink("state");
+	sem_unlink("stdout");
+	sem_close(sem->forks_sem);
+	sem_close(sem->state_sem);
+	sem_close(sem->stdout_sem);
 	free(philo);
 }
 
 int		main(int ac, char **av)
 {
 	t_data	data;
-	t_philo	*philo;
+	t_sem	sem;
+	t_philo	philo;
 
 	if (init_data(&data, ac, av))
 		return (1);
-	philo = init_philo(&data);
+	if (init_sem(&sem, data.nb_philosopher))
+		return (exit_error("Error: init semaphore failed"));
+	init_philo(&data, &sem, &philo);
+	// start process and thread
 	start_philosophers(&data, philo);
-	end_philosophers(&data, philo);
+	// free everything
+	end_philosophers(philo, &sem);
 	if (data.state == DEAD)
 		printf("End of simulation: one of the philosophers died.\n");
-	else if (data.nb_philo_full
-		&& data.nb_philo_full == data.must_eat_nb_time)
+	else if (data.must_eat_nb_time
+		&& data.nb_philo_full == data.nb_philosopher)
 		printf("End of simulation: Philosophers are full !\n");
 	return (0);
 }
