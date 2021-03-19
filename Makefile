@@ -12,17 +12,17 @@ PHILO_ONE				=	philo_one
 PHILO_TWO				=	philo_two
 PHILO_THREE				=	philo_three
 
-INC_DIR_ONE					=	./philo1/includes
-INC_DIR_TWO					=	./philo2/includes
-INC_DIR_THREE				=	./philo3/includes
+INC_DIR_ONE					=	./philo_1/includes
+INC_DIR_TWO					=	./philo_2/includes
+INC_DIR_THREE				=	./philo_3/includes
 
-SRCS_DIR_ONE			=	./philo1/srcs
-SRCS_DIR_TWO			=	./philo2/srcs
-SRCS_DIR_THREE			=	./philo3/srcs
+SRCS_DIR_ONE			=	./philo_1/srcs
+SRCS_DIR_TWO			=	./philo_2/srcs
+SRCS_DIR_THREE			=	./philo_3/srcs
 
-OBJS_DIR_ONE			=	./philo1/objs
-OBJS_DIR_TWO			=	./philo2/objs
-OBJS_DIR_THREE			=	./philo3/objs
+OBJS_DIR_ONE			=	./philo_1/objs
+OBJS_DIR_TWO			=	./philo_2/objs
+OBJS_DIR_THREE			=	./philo_3/objs
 
 SRCS_ONE				=	philo_one.c \
 							init.c \
