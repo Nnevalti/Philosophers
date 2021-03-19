@@ -12,7 +12,7 @@
 
 #include "../includes/philo_two.h"
 
-void		init_mutex_fork(t_philo *philo, int nb_philosopher)
+void		init_semaphore_fork(t_philo *philo, int nb_philosopher)
 {
 	int		i;
 

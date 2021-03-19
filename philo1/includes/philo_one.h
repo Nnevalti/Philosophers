@@ -19,6 +19,9 @@
 # include <sys/time.h>
 # include <pthread.h>
 
+# define FALSE 0
+# define TRUE 1
+
 # define TAKE_FORK "has taken a fork"
 # define EATING "is eating"
 # define SLEEPING "is sleeping"
@@ -53,10 +56,10 @@ typedef struct			s_philo
 	pthread_mutex_t		*right_fork;
 	pthread_mutex_t		state_mutex;
 	pthread_mutex_t		stdout_mutex;
-
 	int					index;
 	long				last_meal;
 	int					nb_meal_eat;
+	int					stop;
 
 }						t_philo;
 

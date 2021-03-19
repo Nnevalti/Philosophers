@@ -17,7 +17,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <sys/time.h>
-# include <pthread.h>
+# include <semaphore.h>
 
 # define TAKE_FORK "has taken a fork"
 # define EATING "is eating"
@@ -49,10 +49,9 @@ typedef struct			s_philo
 {
 	t_data				*data;
 	pthread_t			thread;
-	pthread_mutex_t		*left_fork;
-	pthread_mutex_t		*right_fork;
-	pthread_mutex_t		state_mutex;
-	pthread_mutex_t		stdout_mutex;
+	sem_t				*forks;
+	sem_t				state_mutex;
+	sem_t				stdout_mutex;
 
 	int					index;
 	long				last_meal;

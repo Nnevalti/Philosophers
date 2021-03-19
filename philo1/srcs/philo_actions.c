@@ -15,7 +15,7 @@
 void	display_event(t_philo *philo, char *event)
 {
 	pthread_mutex_lock(&philo->stdout_mutex);
-	if (philo->data->state != DEAD)
+	if (philo->data->state != DEAD && !philo->stop)
 		printf("%.4ldms: Philo N°%d %s !\n",
 			get_time() - philo->data->start, philo->index, event);
 	pthread_mutex_unlock(&philo->stdout_mutex);

@@ -53,6 +53,7 @@ t_philo		*init_philo(t_data *data)
 		philo[i].index = i + 1;
 		philo[i].last_meal = get_time();
 		philo[i].nb_meal_eat = 0;
+		philo[i].stop = FALSE;
 		i++;
 	}
 	return (philo);

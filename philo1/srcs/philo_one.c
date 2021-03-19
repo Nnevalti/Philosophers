@@ -19,15 +19,14 @@ void	*death_check(void *philo_tmp)
 
 	philo = (t_philo *)philo_tmp;
 	data = philo->data;
-	while (data->state != DEAD
-		&& (!philo->nb_meal_eat
-			|| philo->nb_meal_eat < data->must_eat_nb_time))
+	while (data->state != DEAD && !philo->stop)
 	{
 		if ((get_time() - philo->last_meal) > data->time_to_die)
 		{
 			display_event(philo, DEATH);
 			pthread_mutex_lock(&philo->state_mutex);
 			data->state = DEAD;
+			philo->stop = TRUE;
 			pthread_mutex_unlock(&philo->state_mutex);
 			break ;
 		}
@@ -46,11 +45,11 @@ void	*philosophers(void *philo_tmp)
 	pthread_create(&death, NULL, &death_check, philo);
 	pthread_detach(death);
 	philo->index % 2 ? 0 : usleep(data->time_to_eat * MS_IN_US);
-	while (data->state != DEAD
-		&& (!philo->nb_meal_eat
-			|| philo->nb_meal_eat < data->must_eat_nb_time))
+	while (data->state != DEAD && philo->stop == FALSE)
 	{
 		philo_eat(philo);
+		if (!philo->nb_meal_eat && philo->nb_meal_eat < data->must_eat_nb_time)
+			philo->stop = TRUE;
 		display_event(philo, SLEEPING);
 		usleep(data->time_to_sleep * MS_IN_US);
 		display_event(philo, THINKING);
