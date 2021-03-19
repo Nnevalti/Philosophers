@@ -14,24 +14,24 @@
 
 void	display_event(t_philo *philo, char *event)
 {
-	pthread_mutex_lock(&philo->stdout_mutex);
-	if (philo->data->state != DEAD)
+	sem_wait(philo->sem->stdout_sem);
+	if (philo->data->state != DEAD && !philo->stop)
 		printf("%.4ldms: Philo N°%d %s !\n",
 			get_time() - philo->data->start, philo->index, event);
-	pthread_mutex_unlock(&philo->stdout_mutex);
+	sem_post(philo->sem->stdout_sem);
 }
 
 void	philo_eat(t_philo *philo)
 {
-	pthread_mutex_lock(philo->right_fork);
+	sem_wait(philo->sem->forks_sem);
 	display_event(philo, TAKE_FORK);
-	pthread_mutex_lock(philo->left_fork);
+	sem_wait(philo->sem->forks_sem);
 	display_event(philo, TAKE_FORK);
 	philo->last_meal = get_time();
 	display_event(philo, EATING);
 	usleep(philo->data->time_to_eat * MS_IN_US);
 	if (philo->data->must_eat_nb_time)
 		philo->nb_meal_eat++;
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	sem_post(philo->sem->forks_sem);
+	sem_post(philo->sem->forks_sem);
 }

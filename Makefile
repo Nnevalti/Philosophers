@@ -30,7 +30,12 @@ SRCS_ONE				=	philo_one.c \
 							exit.c \
 							utils.c
 
-SRCS_TWO				=	philo_two.c
+SRCS_TWO				=	philo_two.c \
+							init.c \
+							philo_actions.c \
+							exit.c \
+							utils.c
+
 SRCS_THREE				=	philo_three.c
 
 OBJS_ONE				=	$(addprefix $(OBJS_DIR_ONE)/,$(SRCS_ONE:.c=.o))
