@@ -48,7 +48,8 @@ void	*philosophers(void *philo_tmp)
 	while (data->state != DEAD && philo->stop == FALSE)
 	{
 		philo_eat(philo);
-		if (!philo->nb_meal_eat && philo->nb_meal_eat < data->must_eat_nb_time)
+		if (data->must_eat_nb_time
+			&& philo->nb_meal_eat == data->must_eat_nb_time)
 			philo->stop = TRUE;
 		display_event(philo, SLEEPING);
 		usleep(data->time_to_sleep * MS_IN_US);
@@ -105,8 +106,8 @@ int		main(int ac, char **av)
 	end_philosophers(&data, philo);
 	if (data.state == DEAD)
 		printf("End of simulation: one of the philosophers died.\n");
-	else if (data.nb_philo_full
-		&& data.nb_philo_full == data.must_eat_nb_time)
+	else if (data.must_eat_nb_time
+		&& data.nb_philo_full == data.nb_philosopher)
 		printf("End of simulation: Philosophers are full !\n");
 	return (0);
 }
