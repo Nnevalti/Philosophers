@@ -1,73 +1,113 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_one.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/19 15:00:49 by vdescham          #+#    #+#             */
+/*   Updated: 2021/03/19 15:00:49 by vdescham         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_one.h"
 
-void	*philosophers(void *stock)
+void	*death_check(void *philo_tmp)
 {
-	t_data		*data;
-	t_philo		*philo;
+	t_philo			*philo;
+	t_data			*data;
 
-	data = ((t_stock *)stock)->data;
-	philo = ((t_stock *)stock)->philo;
-	while (!data->one_died && (!data->must_eat_nb_time || philo->nb_meal_eat < data->must_eat_nb_time))
+	philo = (t_philo *)philo_tmp;
+	data = philo->data;
+	while (data->state != DEAD
+		&& (!philo->nb_meal_eat
+			|| philo->nb_meal_eat < data->must_eat_nb_time))
 	{
-		philo_take_fork(data, philo);
-		philo_eat(data, philo);
-		philo_sleep(data, philo);
-		philo_think(data, philo);
-		philo->nb_meal_eat++;
+		if ((get_time() - philo->last_meal) > data->time_to_die)
+		{
+			display_event(philo, DEATH);
+			pthread_mutex_lock(&philo->state_mutex);
+			data->state = DEAD;
+			pthread_mutex_unlock(&philo->state_mutex);
+			break ;
+		}
 	}
-	if (data->must_eat_nb_time && philo->nb_meal_eat == data->must_eat_nb_time)
-		data->philo_ate_enough++;
 	return (NULL);
 }
 
-void	start_philosophers(t_data *data, t_philo *philo, t_stock *stock)
+void	*philosophers(void *philo_tmp)
+{
+	t_philo		*philo;
+	t_data		*data;
+	pthread_t	death;
+
+	philo = (t_philo *)philo_tmp;
+	data = philo->data;
+	pthread_create(&death, NULL, &death_check, philo);
+	pthread_detach(death);
+	philo->index % 2 ? 0 : usleep(data->time_to_eat * MS_IN_US);
+	while (data->state != DEAD
+		&& (!philo->nb_meal_eat
+			|| philo->nb_meal_eat < data->must_eat_nb_time))
+	{
+		philo_eat(philo);
+		display_event(philo, SLEEPING);
+		usleep(data->time_to_sleep * MS_IN_US);
+		display_event(philo, THINKING);
+	}
+	if (data->must_eat_nb_time
+		&& philo->nb_meal_eat == data->must_eat_nb_time)
+		data->nb_philo_full++;
+	return (NULL);
+}
+
+void	start_philosophers(t_data *data, t_philo *philo)
 {
 	int			i;
 
 	i = 0;
-	data->start_sec = get_time_sec();
-	data->start_usec = get_time_usec();
+	data->start = get_time();
 	while (i < data->nb_philosopher)
 	{
-		stock[i].data = data;
-		stock[i].philo = &philo[i];
-		pthread_create(&philo[i].thread, NULL, &philosophers, &stock[i]);
+		pthread_create(&philo[i].thread, NULL, &philosophers, &philo[i]);
 		usleep(10);
 		i++;
 	}
+	i = 0;
+	while (i < data->nb_philosopher)
+		pthread_join(philo[i++].thread, NULL);
 }
-void	wait_thread_to_end(t_philo *philo, int nb_philosopher)
+
+void	end_philosophers(t_data *data, t_philo *philo)
 {
 	int		i;
 
 	i = 0;
-	while (i < nb_philosopher)
+	pthread_mutex_destroy(&philo[0].stdout_mutex);
+	pthread_mutex_destroy(&philo[0].state_mutex);
+	while (i < data->nb_philosopher)
 	{
-		pthread_join(philo[i].thread, NULL);
+		pthread_mutex_destroy(philo[i].left_fork);
+		free(philo[i].left_fork);
 		i++;
 	}
+	free(philo);
 }
 
 int		main(int ac, char **av)
 {
-	t_data	*data;
+	t_data	data;
 	t_philo	*philo;
-	t_stock	*stock;
 
-	if (!(data = malloc(sizeof(t_data))))
+	if (init_data(&data, ac, av))
 		return (1);
-	if (init_data(data, ac, av))
-		return (exit_error("Error: Initialisation fatal error\n"));
-	if (!(philo = malloc(sizeof(t_philo) * data->nb_philosopher)))
-		return (1);
-	init_philo(philo, data->nb_philosopher);
-	if (!(stock = malloc(sizeof(t_stock) * data->nb_philosopher)))
-		return (1);
-	start_philosophers(data, philo, stock);
-	wait_thread_to_end(philo, data->nb_philosopher);
-	if (data->philo_ate_enough == data->nb_philosopher)
-		printf("End: All philosophers ate enough\n");
-	free_philo(data, philo, data->nb_philosopher);
-	free(stock);
+	philo = init_philo(&data);
+	start_philosophers(&data, philo);
+	end_philosophers(&data, philo);
+	if (data.state == DEAD)
+		printf("End of simulation: one of the philosophers died.\n");
+	else if (data.nb_philo_full
+		&& data.nb_philo_full == data.must_eat_nb_time)
+		printf("End of simulation: Philosophers are full !\n");
 	return (0);
 }

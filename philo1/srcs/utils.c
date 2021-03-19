@@ -1,30 +1,31 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/19 15:00:54 by vdescham          #+#    #+#             */
+/*   Updated: 2021/03/19 15:00:55 by vdescham         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_one.h"
 
-unsigned int	get_time(unsigned int start_sec, unsigned start_usec)
+long		get_time(void)
 {
-	struct timeval	now;
+	struct timeval	time;
 
-	gettimeofday(&now, NULL);
-	return ((now.tv_sec - start_sec * S_IN_US) + (now.tv_usec - start_usec));
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-unsigned int	get_time_sec(void)
+int				ft_isdigit(char c)
 {
-	struct timeval	now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_sec);
+	return (c >= '0' && c <= '9');
 }
 
-unsigned int	get_time_usec(void)
-{
-	struct timeval	now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_usec);
-}
-
-long		ft_atoi(const char *str)
+long			ft_atoi(const char *str)
 {
 	int		i;
 	int		sign;
@@ -49,7 +50,7 @@ long		ft_atoi(const char *str)
 	return (value * sign);
 }
 
-int		ft_strlen(char *str)
+int			ft_strlen(char *str)
 {
 	int		i;
 

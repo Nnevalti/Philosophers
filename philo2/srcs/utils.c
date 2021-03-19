@@ -1,6 +1,31 @@
-#include "../include/philo_one.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/19 15:00:54 by vdescham          #+#    #+#             */
+/*   Updated: 2021/03/19 15:00:55 by vdescham         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-long		ft_atoi(const char *str)
+#include "../includes/philo_two.h"
+
+long		get_time(void)
+{
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+int				ft_isdigit(char c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+long			ft_atoi(const char *str)
 {
 	int		i;
 	int		sign;
@@ -25,44 +50,7 @@ long		ft_atoi(const char *str)
 	return (value * sign);
 }
 
-long			ft_nblen(long nb)
-{
-	int		len;
-
-	len = nb <= 0 ? 1 : 0;
-	while (nb != 0)
-	{
-		nb = nb / 10;
-		len++;
-	}
-	return (len);
-}
-
-char			*ft_itoa(long nb)
-{
-	int				sign;
-	int				len;
-	char			*str;
-
-	sign = (nb < 0 ? 1 : 0);
-	len = ft_nblen(nb);
-	if (sign == 1)
-		nb = -nb;
-	if (!(str = (char *)malloc(sizeof(char) * len + 1)))
-		return (NULL);
-	str[len--] = '\0';
-	while (len >= 0)
-	{
-		str[len] = nb % 10 + '0';
-		nb = nb / 10;
-		len--;
-	}
-	if (sign == 1)
-		str[0] = '-';
-	return (str);
-}
-
-int		ft_strlen(char *str)
+int			ft_strlen(char *str)
 {
 	int		i;
 

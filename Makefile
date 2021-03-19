@@ -12,9 +12,9 @@ PHILO_ONE				=	philo_one
 PHILO_TWO				=	philo_two
 PHILO_THREE				=	philo_three
 
-INC_ONE					=	-I ./philo1/includes
-INC_TWO					=	-I ./philo2/includes
-INC_THREE				=	-I ./philo3/includes
+INC_DIR_ONE					=	./philo1/includes
+INC_DIR_TWO					=	./philo2/includes
+INC_DIR_THREE				=	./philo3/includes
 
 SRCS_DIR_ONE			=	./philo1/srcs
 SRCS_DIR_TWO			=	./philo2/srcs
@@ -27,7 +27,6 @@ OBJS_DIR_THREE			=	./philo3/objs
 SRCS_ONE				=	philo_one.c \
 							init.c \
 							philo_actions.c \
-							free.c \
 							exit.c \
 							utils.c
 
@@ -39,13 +38,13 @@ OBJS_TWO				=	$(addprefix $(OBJS_DIR_TWO)/,$(SRCS_TWO:.c=.o))
 OBJS_THREE				=	$(addprefix $(OBJS_DIR_THREE)/,$(SRCS_THREE:.c=.o))
 
 $(OBJS_DIR_ONE)/%.o		:	$(SRCS_DIR_ONE)/%.c
-							$(CC) $(CFLAGS) $(INC_ONE) -c $< -o $@
+							$(CC) $(CFLAGS) -I $(INC_DIR_ONE) -c $< -o $@
 
 $(OBJS_DIR_TWO)/%.o		:	$(SRCS_DIR_TWO)/%.c
-							$(CC) $(CFLAGS) $(INC_TWO) -c $< -o $@
+							$(CC) $(CFLAGS) -I $(INC_DIR_TWO) -c $< -o $@
 
 $(OBJS_DIR_THREE)/%.o	:	$(SRCS_DIR_THREE)/%.c
-							$(CC) $(CFLAGS) $(INC_THREE) -c $< -o $@
+							$(CC) $(CFLAGS) $(INC_DIR_THREE) -c $< -o $@
 
 all						:	$(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
@@ -70,5 +69,9 @@ fclean					:	clean
 							@rm -f $(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
 re						:	fclean all
+
+norm					:
+							~/.norminette/norminette.rb $(SRCS_DIR_ONE) $(SRCS_DIR_TWO) $(SRCS_DIR_THREE)
+							~/.norminette/norminette.rb $(INC_DIR_ONE) $(INC_DIR_TWO) $(INC_DIR_THREE)
 
 .PHONY					:	all re clean fclean

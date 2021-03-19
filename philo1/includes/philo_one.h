@@ -1,5 +1,17 @@
-#ifndef PHILO_ONE
-# define PHILO_ONE
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_one.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/19 15:03:13 by vdescham          #+#    #+#             */
+/*   Updated: 2021/03/19 15:03:14 by vdescham         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef PHILO_ONE_H
+# define PHILO_ONE_H
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -15,60 +27,53 @@
 # define MS_IN_US 1000
 # define S_IN_US 1000000
 
-typedef enum			e_bool
+typedef enum			e_state
 {
-	FALSE,
-	TRUE
-}						t_bool;
-
-typedef struct			s_philo
-{
-	pthread_t			thread;
-	pthread_mutex_t		*stdout_mutex;
-	pthread_mutex_t		*left_fork;
-	pthread_mutex_t		*right_fork;
-	int					index;
-	int					last_meal;
-	int					nb_meal_eat;
-	t_bool				is_dead;
-
-}						t_philo;
+	ALIVE,
+	DEAD,
+}						t_state;
 
 typedef struct			s_data
 {
-	t_bool				one_died;
 	int					nb_philosopher;
 	unsigned int		time_to_die;
 	unsigned int		time_to_eat;
 	unsigned int		time_to_sleep;
 	int					must_eat_nb_time;
-	int					philo_ate_enough;
-	unsigned int		start_sec;
-	unsigned int		start_usec;
-	struct timeval		start;
+	long				start;
+	t_state				state;
+	int					nb_philo_full;
 }						t_data;
 
-typedef struct			s_stock
+typedef struct			s_philo
 {
 	t_data				*data;
-	t_philo				*philo;
-}						t_stock;
+	pthread_t			thread;
+	pthread_mutex_t		*left_fork;
+	pthread_mutex_t		*right_fork;
+	pthread_mutex_t		state_mutex;
+	pthread_mutex_t		stdout_mutex;
+
+	int					index;
+	long				last_meal;
+	int					nb_meal_eat;
+
+}						t_philo;
 
 #endif
 
 /*
 **		INIT.C
 */
+t_philo					*init_philo(t_data *data);
 int						init_data(t_data *data, int ac, char **av);
-void					init_philo(t_philo *philo, int nb_philosopher);
 
 /*
 **		PHILO_ACTIONS.C
 */
-void					philo_take_fork(t_data *data, t_philo *philo);
-void					philo_eat(t_data *data, t_philo *philo);
-void					philo_sleep(t_data *data, t_philo *philo);
-void					philo_think(t_data *data, t_philo *philo);
+void					display_event(t_philo *philo, char *event);
+void					philo_eat(t_philo *philo);
+
 /*
 **		FREE.C
 */
@@ -81,8 +86,7 @@ int						exit_error(char *str);
 /*
 **		UTILS.C
 */
-unsigned int			get_time(unsigned int start_sec, unsigned start_usec);
-unsigned int			get_time_sec(void);
-unsigned int			get_time_usec(void);
+long					get_time();
+int						ft_isdigit(char c);
 int						ft_strlen(char *str);
 long					ft_atoi(const char *str);
