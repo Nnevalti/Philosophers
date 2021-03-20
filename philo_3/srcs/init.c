@@ -10,16 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo_two.h"
+#include "../includes/philo_three.h"
 
 int			init_sem(t_sem *sem, int nb_p)
 {
+	sem_unlink("state_parent");
+	sem_unlink("state_child");
+	sem_unlink("philo_full");
 	sem_unlink("forks");
-	sem_unlink("state");
 	sem_unlink("stdout");
-	if ((sem->forks_sem = sem_open("forks", O_CREAT, 0644, nb_p)) == SEM_FAILED)
+	if ((sem->state_sem_parent =
+			sem_open("state_parent", O_CREAT, 0644, 0)) == SEM_FAILED)
 		return (1);
-	if ((sem->state_sem = sem_open("state", O_CREAT, 0644, 1)) == SEM_FAILED)
+	if ((sem->state_sem_child =
+			sem_open("state_child", O_CREAT, 0644, 0)) == SEM_FAILED)
+		return (1);
+	if ((sem->philo_full_sem =
+			sem_open("philo_full", O_CREAT, 0644, 0)) == SEM_FAILED)
+		return (1);
+	if ((sem->forks_sem = sem_open("forks", O_CREAT, 0644, nb_p)) == SEM_FAILED)
 		return (1);
 	if ((sem->stdout_sem = sem_open("stdout", O_CREAT, 0644, 1)) == SEM_FAILED)
 		return (1);
@@ -35,7 +44,6 @@ void		init_philo(t_data *data, t_sem *sem, t_philo *philo)
 	philo->last_meal = get_time();
 	philo->nb_meal_eat = 0;
 	philo->stop = FALSE;
-	return (philo);
 }
 
 int			check_isnum(const char *str)
@@ -82,6 +90,7 @@ int			init_data(t_data *data, int ac, char **av)
 	else
 		data->must_eat_nb_time = 0;
 	data->nb_philo_full = 0;
+	data->full = FALSE;
 	if (data->nb_philosopher < 2)
 		return (exit_error("Error: There should be at least 2 philosophers\n"));
 	return (0);

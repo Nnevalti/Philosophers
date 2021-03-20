@@ -22,7 +22,6 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 
-
 # define FALSE 0
 # define TRUE 1
 
@@ -39,7 +38,6 @@ typedef enum		e_state
 	ALIVE,
 	DEAD,
 }					t_state;
-
 
 typedef struct		s_data
 {

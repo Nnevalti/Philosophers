@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_one.h                                        :+:      :+:    :+:   */
+/*   philo_three.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdescham <vdescham@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -21,7 +21,8 @@
 # include <semaphore.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-
+# include <sys/types.h>
+# include <sys/wait.h>
 
 # define FALSE 0
 # define TRUE 1
@@ -40,7 +41,6 @@ typedef enum		e_state
 	DEAD,
 }					t_state;
 
-
 typedef struct		s_data
 {
 	int				nb_philosopher;
@@ -51,11 +51,13 @@ typedef struct		s_data
 	long			start;
 	t_state			state;
 	int				nb_philo_full;
+	int				full;
 }					t_data;
 
 typedef struct		s_sem
 {
 	sem_t			*forks_sem;
+	sem_t			*philo_full_sem;
 	sem_t			*state_sem_parent;
 	sem_t			*state_sem_child;
 	sem_t			*stdout_sem;
@@ -77,7 +79,7 @@ typedef struct		s_philo
 **		INIT.C
 */
 int					init_sem(t_sem *sem, int nb_p);
-t_philo				*init_philo(t_data *data, t_sem *sem);
+void				init_philo(t_data *data, t_sem *sem, t_philo *philo);
 int					init_data(t_data *data, int ac, char **av);
 
 /*
@@ -85,9 +87,17 @@ int					init_data(t_data *data, int ac, char **av);
 */
 void				display_event(t_philo *philo, char *event);
 void				philo_eat(t_philo *philo);
+
+/*
+**		MONITOR.C
+*/
+void				*philo_died_in_parent(void *philo_tmp);
+void				*philo_died_in_child(void *philo_tmp);
+void				*philo_eat_meal(void *philo_tmp);
 /*
 **		EXIT.C
 */
+void				wait_for_process(t_data *data, t_philo *philo);
 int					exit_error(char *str);
 
 /*

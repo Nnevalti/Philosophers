@@ -36,7 +36,12 @@ SRCS_TWO				=	philo_two.c \
 							exit.c \
 							utils.c
 
-SRCS_THREE				=	philo_three.c
+SRCS_THREE				=	philo_three.c \
+							init.c \
+							philo_actions.c \
+							monitor.c \
+							exit.c \
+							utils.c
 
 OBJS_ONE				=	$(addprefix $(OBJS_DIR_ONE)/,$(SRCS_ONE:.c=.o))
 OBJS_TWO				=	$(addprefix $(OBJS_DIR_TWO)/,$(SRCS_TWO:.c=.o))
@@ -49,7 +54,7 @@ $(OBJS_DIR_TWO)/%.o		:	$(SRCS_DIR_TWO)/%.c
 							$(CC) $(CFLAGS) -I $(INC_DIR_TWO) -c $< -o $@
 
 $(OBJS_DIR_THREE)/%.o	:	$(SRCS_DIR_THREE)/%.c
-							$(CC) $(CFLAGS) $(INC_DIR_THREE) -c $< -o $@
+							$(CC) $(CFLAGS) -I $(INC_DIR_THREE) -c $< -o $@
 
 all						:	$(PHILO_ONE) $(PHILO_TWO) $(PHILO_THREE)
 
