@@ -80,9 +80,11 @@ void	start_philosophers(t_data *data, t_philo *philo)
 void	end_philosophers(t_philo *philo, t_sem *sem)
 {
 	sem_unlink("forks");
+	sem_unlink("forks_protect");
 	sem_unlink("state");
 	sem_unlink("stdout");
 	sem_close(sem->forks_sem);
+	sem_close(sem->forks_protect_sem);
 	sem_close(sem->state_sem);
 	sem_close(sem->stdout_sem);
 	free(philo);

@@ -15,9 +15,13 @@
 int			init_sem(t_sem *sem, int nb_p)
 {
 	sem_unlink("forks");
+	sem_unlink("forks_protect");
 	sem_unlink("state");
 	sem_unlink("stdout");
 	if ((sem->forks_sem = sem_open("forks", O_CREAT, 0644, nb_p)) == SEM_FAILED)
+		return (1);
+	if ((sem->forks_protect_sem =
+		sem_open("forks_protect", O_CREAT, 0644, (nb_p / 2))) == SEM_FAILED)
 		return (1);
 	if ((sem->state_sem = sem_open("state", O_CREAT, 0644, 1)) == SEM_FAILED)
 		return (1);

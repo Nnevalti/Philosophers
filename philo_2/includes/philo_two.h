@@ -54,6 +54,7 @@ typedef struct		s_data
 typedef struct		s_sem
 {
 	sem_t			*forks_sem;
+	sem_t			*forks_protect_sem;
 	sem_t			*state_sem;
 	sem_t			*stdout_sem;
 }					t_sem;

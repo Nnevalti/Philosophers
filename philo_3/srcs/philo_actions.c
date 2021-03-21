@@ -23,6 +23,7 @@ void	display_event(t_philo *philo, char *event)
 
 void	philo_eat(t_philo *philo)
 {
+	sem_wait(philo->sem->forks_protect_sem);
 	sem_wait(philo->sem->forks_sem);
 	display_event(philo, TAKE_FORK);
 	sem_wait(philo->sem->forks_sem);
@@ -34,4 +35,5 @@ void	philo_eat(t_philo *philo)
 		philo->nb_meal_eat++;
 	sem_post(philo->sem->forks_sem);
 	sem_post(philo->sem->forks_sem);
+	sem_post(philo->sem->forks_protect_sem);
 }

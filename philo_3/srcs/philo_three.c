@@ -92,11 +92,13 @@ void	end_philosophers(t_philo *philo, t_sem *sem)
 	sem_unlink("state_child");
 	sem_unlink("philo_full");
 	sem_unlink("forks");
+	sem_unlink("forks_protect");
 	sem_unlink("stdout");
 	sem_close(sem->state_sem_child);
 	sem_close(sem->state_sem_parent);
 	sem_close(sem->philo_full_sem);
 	sem_close(sem->forks_sem);
+	sem_close(sem->forks_protect_sem);
 	sem_close(sem->stdout_sem);
 	free(philo->pid);
 }
